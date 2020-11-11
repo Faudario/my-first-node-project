@@ -1,7 +1,13 @@
 let socket = io();
+let myColor = 255
 
 socket.on("connect", newConnection);
 socket.on("mouseBroadcast", drawOtherMouse);
+socket.on("color", setColor);
+
+function setColor(assignedColor) {
+  myColor = assignedColor;
+}
 
 function newConnection() {
   console.log("your id:" + socket.id)
@@ -9,7 +15,7 @@ function newConnection() {
 
 function drawOtherMouse(data) {
   noStroke()
-  fill(255, 255, 0)
+  fill(data.color)
   ellipse(data.x, data.y, 10)
 }
 
@@ -27,13 +33,16 @@ function draw() {
 }
 
 function mouseMoved() {
+  push()
   noStroke()
-  fill(255)
+  fill(myColor)
   ellipse(mouseX, mouseY, 20)
+  pop()
   //create the message
   let message = {
     x: mouseX,
     y: mouseY,
+    color: myColor,
   }
   // send to the server
   socket.emit("mouse", message); //"mouse" is title, message is the variable
